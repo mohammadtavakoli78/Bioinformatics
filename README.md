@@ -8,19 +8,19 @@
 - [Technologies](https://github.com/mohammadtavakoli78/Bioinformatics#technologies)
 
 ## Introduction
-This is projects of Bioinformatics course. There are Threejects.<br>
-The first one i implement ```Semi-Global alignmen``` for proteins.<br>
+This is projects of Bioinformatics course. There are Three Projects.<br>
+The first one, i implement ```Semi-Global alignmen``` for proteins.<br>
 The second project which is implemented with python, is ```multiple alignment``` using ```star-Alignment```.<br>
 The third project which is implemented with python, we build ```profile``` of a ```MSA```.<br>
 
 ## 💻 First_Project
-The first one i implement ```Semi-Global alignmen``` for proteins. [Codes are in this link](https://github.com/mohammadtavakoli78/Artificial-Intelligence/tree/master/Project%201%20(Seach%20Algorithms-IDS-BBFS-AStar)).
+The first one i implement ```Semi-Global alignmen``` for proteins. [Codes are in this link](https://github.com/mohammadtavakoli78/Bioinformatics/tree/master/Project%201).
 
 ## 💻 Second_Project
-The second project which is implemented with python, is ```multiple alignment``` using ```star-Alignment```. [Codes are in this link](https://github.com/mohammadtavakoli78/Artificial-Intelligence/tree/master/Project%202%20(Genetic%20Algorithm)).
+The second project which is implemented with python, is ```multiple alignment``` using ```star-Alignment```. [Codes are in this link](https://github.com/mohammadtavakoli78/Bioinformatics/tree/master/Project%202).
 
 ## 💻 Third_Project
-The third project which is implemented with python, we build profile of a MSA. [Codes are in this link](https://github.com/mohammadtavakoli78/Artificial-Intelligence/tree/master/Project%203%20(Constraint%20Satisfaction%20Problems)).
+The third project which is implemented with python, we build profile of a MSA. [Codes are in this link](https://github.com/mohammadtavakoli78/Bioinformatics/tree/master/Project%203).
 
 ## Technologies
 Project is created with:

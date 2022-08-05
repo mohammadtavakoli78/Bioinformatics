@@ -14,7 +14,7 @@ The second project which is implemented with python, is ```multiple alignment```
 The third project which is implemented with python, we build ```profile``` of a ```MSA```.<br>
 
 ## 💻 First_Project
-The first one i implement ```Semi-Global alignmen``` for proteins. [Codes are in this link](https://github.com/mohammadtavakoli78/Bioinformatics/tree/master/Project%201)).
+The first one i implement ```Semi-Global alignmen``` for proteins. [Codes are in this link](https://github.com/mohammadtavakoli78/Bioinformatics/tree/master/Project%201).
 
 ## 💻 Second_Project
 The second project which is implemented with python, is ```multiple alignment``` using ```star-Alignment```. [Codes are in this link](https://github.com/mohammadtavakoli78/Bioinformatics/tree/master/Project%202).

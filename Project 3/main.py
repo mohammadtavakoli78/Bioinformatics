@@ -1,92 +1,124 @@
-import math
-from utils import *
+import numpy as np
 
-PSEUDO_COUNT = 2
-all_sequence = []
-
-
-def AllKLength(given_set, k, window):
-    n = len(given_set)
-    AllKLengthRec(given_set, "", n, k, window)
+MAX_SEQUENCE_LENGTH = 10
+PSEUDOCOUNT = 2
 
 
-def AllKLengthRec(given_set, prefix, n, k, window):
-    if k == 0:
-        if prefix.replace("-", "") in window[:-1]:
-            all_sequence.append(prefix)
-        return
-    for i in range(n):
-        new_prefix = prefix + given_set[i]
-        AllKLengthRec(given_set, new_prefix, n, k - 1, window)
+def find_amino_acids(sequences):
+    amino_acids = []
+    for seq in sequences:
+        for char in seq:
+            if char not in amino_acids:
+                amino_acids.append(char)
+    return amino_acids
 
 
-def get_unique_amino_acids(sequences: list):
-    unique_str = ""
-    for sequence in sequences:
-        unique_str += sequence
-    unique_str = "".join(dict.fromkeys(unique_str))
-
-    return unique_str.replace("-", "") + "-"
-
-
-def get_one_char_frequency(sequences: list, index: int, desired_char: str):
+def find_num_occurences(amino, index, sequences):
     counter = 0
-    for sequence in sequences:
-        if sequence[index] == desired_char:
+    for seq in sequences:
+        if amino == seq[index]:
             counter += 1
     return counter
 
 
-def create_score_matrix(sequences: list, alphabets: str):
-    one_sequence_length = len(sequences[0])
-    number_of_sequences = len(sequences)
-    alphabets_length = len(alphabets)
-    score_matrix = {}
-    for alphabet in alphabets:
-        temp = []
-        score_matrix[alphabet] = []
-        for n in range(one_sequence_length):
-            score = (get_one_char_frequency(sequences=sequences, index=n, desired_char=alphabet) + PSEUDO_COUNT) / (
-                    number_of_sequences + alphabets_length * PSEUDO_COUNT)
-            temp.append(score)
-        sum_temp = sum(temp)
-        overall_frequency = sum_temp / one_sequence_length
-        new_temp = [math.log(x / overall_frequency, 2) for x in temp]
-        score_matrix[alphabet] = new_temp
-    return score_matrix
+def create_PSSM_matrix(sequences):
+    num_of_seqs = len(sequences)
+    seq_length = len(sequences[0])
+    amino_acids = find_amino_acids(sequences)
+
+    profile = np.zeros((len(amino_acids), seq_length))
+
+    for amino_i in range(len(amino_acids)):
+        for i in range(seq_length):
+            profile[amino_i][i] = find_num_occurences(amino_acids[amino_i], i, sequences)
+
+    profile = profile + PSEUDOCOUNT
+    profile = profile / (num_of_seqs + len(amino_acids) * PSEUDOCOUNT)
+
+    for row_i in range(profile.shape[0]):
+        profile[row_i] = profile[row_i] / (profile[row_i].sum() / seq_length)
+
+    profile = np.log2(profile)
+
+    return profile, amino_acids
 
 
-def get_one_sub_sequence_score(score_matrix: dict, sequence: str):
+def calculate_score(sequence, profile, amino_acids):
     score = 0
-    for index, char in enumerate(sequence):
-        score += score_matrix[char][index]
+    for char_i in range(len(sequence)):
+        amino_index = amino_acids.index(sequence[char_i])
+        score += profile[amino_index][char_i]
+
     return score
 
 
-def get_best_sub_sequence(score_matrix: dict, final_sequence: str, one_sequence_length: int):
-    final_score = 0
-    final_sub_sequence = ""
-    final_sequence_length = len(final_sequence)
-    offset = 0
-    while offset + one_sequence_length - 1 <= final_sequence_length:
-        window = final_sequence[offset:offset + one_sequence_length - 1]
-        window = window + "-"
-        global all_sequence
-        all_sequence = []
-        AllKLength([char for char in window], one_sequence_length, window)
-        offset += 1
-        for seq in all_sequence:
-            score = get_one_sub_sequence_score(score_matrix=score_matrix, sequence=seq)
-            if score > final_score:
-                final_score = score
-                final_sub_sequence = seq
-    return final_score, final_sub_sequence
+def add_one_gap(sequences):
+    new_seqs = []
+    for seq in sequences:
+        for j in range(len(seq)):
+            new_seq = seq[:j] + "-" + seq[j:]
+            if new_seq not in new_seqs:
+                new_seqs.append(new_seq)
+
+        new_seq = seq + "-"
+        if new_seq not in new_seqs:
+            new_seqs.append(new_seq)
+
+    return new_seqs
 
 
-if __name__ == "__main__":
-    sequences, final_sequence = get_input()
-    alphabets = get_unique_amino_acids(sequences=sequences)
-    score_matrix = create_score_matrix(sequences=sequences, alphabets=alphabets)
-    final_score, final_sub_sequence = get_best_sub_sequence(score_matrix=score_matrix, final_sequence=final_sequence,
-                                                            one_sequence_length=len(sequences[0]))
-    print(final_sub_sequence)
+def generate_gaps(sequence, num_gaps):
+    final_seqs = []
+    sequences = [sequence]
+    while True:
+        generated_seqs = add_one_gap(sequences)
+        if len(generated_seqs[0]) == len(sequence) + num_gaps:
+            final_seqs += generated_seqs
+            break
+        sequences = generated_seqs
+
+    return final_seqs
+
+
+def create_seqs_with_gap(sequence, max_length):
+    max_num_of_gaps = max_length - len(sequence)
+    generated_sequences = generate_gaps(sequence, max_num_of_gaps)
+    return generated_sequences
+
+
+def find_best_subsequence(profile, sequence, amino_acids):
+    max_score = float('-inf')
+    best_subseq = ""
+    seq_length = profile.shape[1]
+    for sl in range(seq_length, 0, -1):
+        for i in range(len(sequence) - sl + 1):
+            tmp_seq = sequence[i:i+sl]
+            score = calculate_score(tmp_seq, profile, amino_acids)
+            if score > max_score:
+                best_subseq = tmp_seq
+                max_score = score
+
+            # here I create different versions with gap
+            if len(tmp_seq) < seq_length:
+                tmps_with_gap = create_seqs_with_gap(tmp_seq, seq_length)
+                for seq in tmps_with_gap:
+                    score_with_gap = calculate_score(seq, profile, amino_acids)
+                    if score_with_gap > max_score:
+                        best_subseq = seq
+                        max_score = score_with_gap
+
+    return best_subseq
+
+
+if name == 'main':
+    number_of_sequences = int(input())
+    msa_sequences = []
+    for nos in range(number_of_sequences):
+        msa_sequences.append(input())
+
+    target_sequence = input()
+
+    PSSM_matrix, amino_acids_array = create_PSSM_matrix(msa_sequences)
+    best_subsequence = find_best_subsequence(PSSM_matrix, target_sequence, amino_acids_array)
+
+    print(best_subsequence)

@@ -8,8 +8,8 @@
 - [Technologies](https://github.com/mohammadtavakoli78/Bioinformatics#technologies)
 
 ## Introduction
-This is projects of Bioinformatics course. There are Threejects.<br>
-The first one i implement ```Semi-Global alignmen``` for proteins.<br>
+This is projects of Bioinformatics course. There are Three Projects.<br>
+The first one, i implement ```Semi-Global alignmen``` for proteins.<br>
 The second project which is implemented with python, is ```multiple alignment``` using ```star-Alignment```.<br>
 The third project which is implemented with python, we build ```profile``` of a ```MSA```.<br>
 
